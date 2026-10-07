@@ -28,3 +28,7 @@ dist/
 # Ignore database files if any local DB created
 *.db
 *.pkl
+
+# Optional — large data files (uncomment if you don't want raw/processed data in git)
+# data/raw/
+#data/processed/

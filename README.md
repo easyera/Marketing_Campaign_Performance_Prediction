@@ -1,160 +1,58 @@
-# 📊 Marketing Campaign Performance Prediction
-
-An end-to-end Machine Learning project to analyze and predict marketing campaign performance across multiple brands (Nykaa, Purplle, Tira).
-
----
-
-## 🎯 Project Overview
-
-Marketing teams generate large volumes of campaign data — impressions, clicks, conversions, revenue, and ROI. This project transforms that raw data into a structured ML pipeline that:
-
-- Predicts **Revenue** using a Regression model
-- Predicts **Profit / Loss** outcome using a Classification model
-- Deploys predictions through an interactive **Streamlit dashboard**
-
----
-
 ## 🗂️ Project Structure
 
-```
 Marketing Campaign Performance Prediction/
 │
 ├── data/
-│   ├── raw/                        # Original raw CSV files
-│   ├── cleaned/                    # After cleaning & deduplication
-│   └── processed/                  # Model-ready dataset
+│   ├── raw/                         # Original raw CSVs (Nykaa, Purplle, Tira)
+│   ├── cleaned/                     # Cleaned, funnel-validated data
+│   └── processed/                   # Processed data (with missing values)
 │
 ├── notebooks/
-│   ├── data_preprocessing.ipynb    # Cleaning, feature engineering, encoding
-│   ├── eda.ipynb                   # Exploratory Data Analysis
-│   ├── regression_model.ipynb      # Revenue prediction model
-│   └── classification_model.ipynb  # Profit/Loss prediction model
+│   ├── Initial_analysis.ipynb       # Business understanding, column exploration
+│   ├── Cleaning.ipynb          # Imputation, funnel validation, ROI 
+│   ├── EDA.ipynb                    # Exploratory analysis, 10 documented insights
+│   ├── Feature_engineering.ipynb    # Multi-label + one-hot encoding, Profit_Flag
+│   ├── Regression_model.ipynb       # Revenue prediction model
+│   └── Classification_model.ipynb   # Profit/Loss prediction model
 │
 ├── model/
-│   └── parameters/
-│       ├── regression_model.pkl        # Trained regression model
-│       ├── classification_model.pkl    # Trained classification model
-│       ├── regression_features.pkl     # Feature list for regression
-│       ├── classification_features.pkl # Feature list for classification
-│       └── label_mappings.json         # Encoding maps for categorical inputs
+│   ├── regression_model.pkl
+│   ├── classification_model.pkl
+│   ├── regression_features.pkl
+│   ├── classification_features.pkl
+│   └── label_mappings.json
 │
-├── main.py                         # Streamlit dashboard app
+├── app.py                          # Streamlit entry point
+├── pages/
+│   ├── EDA_Dashboard.py
+│   └── Prediction.py
 ├── requirements.txt
 ├── .gitignore
 └── README.md
-```
 
----
-
-## ⚙️ Setup & Installation
-
-### 1. Clone the repository
-
-```bash
-git clone https://github.com/your-username/marketing-campaign-prediction.git
-cd marketing-campaign-prediction
-```
-
-### 2. Create a virtual environment
-
-```bash
-python -m venv venv
-
-# Activate — Windows
-venv\Scripts\activate
-
-# Activate — Mac/Linux
-source venv/bin/activate
-```
-
-### 3. Install dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-### 4. Generate model files
-
-Since `.pkl` model files are excluded from Git (large binaries), you need to generate them locally:
-
-```bash
-# Step 1 — Run preprocessing notebook to generate the processed dataset
-jupyter notebook notebooks/data_preprocessing.ipynb
-
-# Step 2 — Run regression notebook to train and save regression_model.pkl
-jupyter notebook notebooks/regression_model.ipynb
-
-# Step 3 — Run classification notebook to train and save classification_model.pkl
-jupyter notebook notebooks/classification_model.ipynb
-```
-
-After running all three notebooks, your `model/parameters/` folder will have all required files.
-
----
 
 ## 🚀 Running the Streamlit App
 
 ```bash
-streamlit run main.py
+streamlit run app.py
 ```
-
-The app will open in your browser at `http://localhost:8501`
-
----
 
 ## 🖥️ How to Use the Dashboard
 
-1. **Fill in campaign details** in the left sidebar:
-   - Select **Campaign Type** (Email, Influencer, Paid Ads, SEO, Social Media)
-   - Select **Target Audience** and **Customer Segment**
-   - Check the **Channels Used** (Facebook, Google, Instagram, etc.)
-   - Enter numeric inputs: Duration, Impressions, Clicks, Leads, Conversions, Acquisition Cost, Engagement Score
+**EDA Dashboard page:** View KPIs (total campaigns, avg revenue, avg ROI), brand comparison, channel effectiveness, top/bottom campaigns, and spend-revenue-ROI correlations.
 
-2. **Click 🚀 Predict**
+**Prediction page:**
+1. Fill in campaign details — Brand, Campaign Type, Target Audience, Customer Segment, Language, Duration, funnel metrics (Impressions through Conversions), Acquisition Cost, Engagement Score, and Channels Used
+2. Click **🔮 Predict Performance**
+3. View results: Predicted Revenue, Profit/Loss outcome, Confidence %, and Estimated ROI
 
-3. **View Results:**
-   - 💰 **Predicted Revenue** — estimated revenue from the campaign
-   - 📈 **Campaign Outcome** — Profit ✅ or Loss ❌
-   - 🎯 **Confidence** — how confident the model is in its prediction
-   - **Probability chart** — visual breakdown of Profit vs Loss probability
-   - **Estimated ROI** — auto-calculated from predicted revenue and cost
+| Task                       | Model           | Metric   | Score |
+|  ---                       |  ---            |   ---    |  ---  |
+| Revenue Prediction         | XGBoost (tuned) | R²       | 0.77  |
+| Profit/Loss Classification | XGBoost         | Accuracy | 0.92  |
 
----
+## 📌 Notes
 
-## 🤖 Models
+- Revenue regression R² plateaus around 0.77 across 8 tested algorithms (Linear, Random Forest, XGBoost, LightGBM, CatBoost, tuned variants) — indicates a feature/data ceiling rather than a model-selection issue.
+- Classification excludes ROI and Total_Cost as features to avoid data leakage, since Profit/Loss is directly derived from ROI.
 
-| Task | Model | Metric | Score |
-|---|---|---|---|
-| Revenue Prediction | Random Forest Regressor | R² | 0.79 |
-| Profit/Loss Classification | Random Forest Classifier | F1-Score | 0.94 |
-
----
-
-## 🛠️ Tech Stack
-
-| Tool | Purpose |
-|---|---|
-| Python | Core language |
-| Pandas & NumPy | Data processing |
-| Scikit-learn | Model training |
-| Matplotlib & Seaborn | EDA visualizations |
-| Plotly | Interactive charts |
-| Streamlit | Dashboard deployment |
-| Jupyter Notebook | Development environment |
-
----
-
-## 📦 Dataset
-
-The dataset contains marketing campaign data with the following key columns:
-
-`Campaign_Type`, `Target_Audience`, `Channel_Used`, `Impressions`, `Clicks`, `Leads`, `Conversions`, `Revenue`, `Acquisition_Cost`, `ROI`, `Engagement_Score`, `Customer_Segment`, `Duration`
-
-> Dataset source: [Marketing Campaign Performance Prediction Datasets](https://drive.google.com/drive/folders/1hZBFlErfcTQ5G8o9TmrMk1ZJl5ZpeEkV)
-
----
-
-## 👤 Author
-
-**Your Name**
-- GitHub: [@your-username](https://github.com/your-username)
